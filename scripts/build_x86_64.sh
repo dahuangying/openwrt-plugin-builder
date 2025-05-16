@@ -50,12 +50,12 @@ cp "$GITHUB_WORKSPACE/config/x86_64.config" .config
 # 设置默认配置
 make defconfig
 
-# ✅ 编译指定插件，避免触发不必要的系统包编译
-make package/passwall/compile -j$(nproc) || make package/passwall/compile -j1 V=s
-make package/passwall2/compile -j$(nproc) || make package/passwall2/compile -j1 V=s
-make package/shadowsocksr-libev/compile -j$(nproc) || make package/shadowsocksr-libev/compile -j1 V=s
-make package/luci-app-ssr-plus/compile -j$(nproc) || make package/luci-app-ssr-plus/compile -j1 V=s
-make package/luci-app-openclash/compile -j$(nproc) || make package/luci-app-openclash/compile -j1 V=s
+# ❌ 修改这里，正确调用 feeds 下的插件路径
+make package/feeds/passwall/luci-app-passwall/compile -j$(nproc) || make package/feeds/passwall/luci-app-passwall/compile -j1 V=s
+make package/feeds/passwall2/luci-app-passwall2/compile -j$(nproc) || make package/feeds/passwall2/luci-app-passwall2/compile -j1 V=s
+make package/feeds/helloworld/shadowsocksr-libev/compile -j$(nproc) || make package/feeds/helloworld/shadowsocksr-libev/compile -j1 V=s
+make package/feeds/helloworld/luci-app-ssr-plus/compile -j$(nproc) || make package/feeds/helloworld/luci-app-ssr-plus/compile -j1 V=s
+make package/feeds/openclash/luci-app-openclash/compile -j$(nproc) || make package/feeds/openclash/luci-app-openclash/compile -j1 V=s
 
 # 拷贝 .ipk 到项目目录
 mkdir -p "$GITHUB_WORKSPACE/ipk/x86_64/"
