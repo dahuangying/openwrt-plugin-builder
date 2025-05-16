@@ -14,7 +14,7 @@ fi
 SDK_DIR=$(find . -maxdepth 1 -type d -name "openwrt-sdk-22.03.6-x86-64*")
 cd "$SDK_DIR"
 
-# 写 feeds.conf.default，去除 passwall/passwall2 feeds
+# 写 feeds.conf.default，添加 passwall 和 passwall2 feeds
 cat > feeds.conf.default << EOF
 src-git packages https://git.openwrt.org/feed/packages.git
 src-git luci https://github.com/openwrt/luci.git
@@ -22,22 +22,13 @@ src-git routing https://git.openwrt.org/feed/routing.git
 src-git telephony https://git.openwrt.org/feed/telephony.git
 src-git helloworld https://github.com/fw876/helloworld
 src-git openclash https://github.com/vernesong/OpenClash.git
+src-git passwall https://github.com/xiaorouji/openwrt-passwall
+src-git passwall2 https://github.com/xiaorouji/openwrt-passwall2
 EOF
 
+# 更新并安装所有feeds
 ./scripts/feeds update -a
 ./scripts/feeds install -a
-
-# 单独 git clone passwall 和 passwall2 到 package/custom/
-CUSTOMPKGDIR="package/custom"
-mkdir -p "$CUSTOMPKGDIR"
-
-if [ ! -d "$CUSTOMPKGDIR/openwrt-passwall" ]; then
-  git clone --depth=1 https://github.com/xiaorouji/openwrt-passwall.git "$CUSTOMPKGDIR/openwrt-passwall"
-fi
-
-if [ ! -d "$CUSTOMPKGDIR/openwrt-passwall2" ]; then
-  git clone --depth=1 https://github.com/xiaorouji/openwrt-passwall2.git "$CUSTOMPKGDIR/openwrt-passwall2"
-fi
 
 # 修复 luci-app-ssr-plus 的 Makefile 防止类型错误（例子）
 SSR_PLUS_MK="feeds/helloworld/luci-app-ssr-plus/Makefile"
@@ -71,10 +62,10 @@ make defconfig
 
 LOGFILE="$GITHUB_WORKSPACE/build.log"
 
-# 编译指定软件包，passwall 路径已变成 package/custom/openwrt-passwall
+# 编译指定软件包（用 feed 的包名）
 for pkg in \
-  custom/openwrt-passwall \
-  custom/openwrt-passwall2 \
+  openwrt-passwall \
+  openwrt-passwall2 \
   shadowsocksr-libev \
   luci-app-ssr-plus \
   luci-app-openclash; do
@@ -85,6 +76,7 @@ done
 # 复制编译好的 ipk
 mkdir -p "$GITHUB_WORKSPACE/ipk/x86_64/"
 find bin/packages/ -name '*.ipk' -exec cp {} "$GITHUB_WORKSPACE/ipk/x86_64/" \;
+
 
 
 
