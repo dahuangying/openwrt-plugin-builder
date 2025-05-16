@@ -10,8 +10,6 @@ echo "开始清理旧版本..."
 
 for ARCH_DIR in "$BASE_DIR"/*/; do
   echo "处理平台目录：$ARCH_DIR"
-
-  # 进入平台目录
   cd "$ARCH_DIR" || continue
 
   # 找出所有ipk文件，按修改时间倒序排序，保留前KEEP_NUM个，其他删除
@@ -22,11 +20,12 @@ for ARCH_DIR in "$BASE_DIR"/*/; do
   else
     echo "删除旧文件："
     echo "$FILES_TO_DELETE"
-    rm -f $FILES_TO_DELETE
+    # 安全删除，避免文件名空格等问题
+    echo "$FILES_TO_DELETE" | xargs -r -d '\n' rm -f --
   fi
 
-  # 返回根目录
   cd - > /dev/null || exit
 done
 
 echo "清理完成！"
+
