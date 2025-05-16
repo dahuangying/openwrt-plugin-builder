@@ -1,8 +1,8 @@
-name: Build OpenWrt Plugin Repo
+name: Build and Clean Plugins
 
 on:
   schedule:
-    - cron: '0 2 */7 * *'  # 每 7 天 UTC 时间 2 点执行
+    - cron: '0 3 */7 * *'  # 每7天凌晨3点触发一次
   workflow_dispatch:       # 允许手动触发
 
 jobs:
@@ -10,22 +10,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Clone Repo
-        uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Install Dependencies
-        run: sudo apt-get update && sudo apt-get install -y gzip coreutils
+    - name: Set up environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y curl jq # 你实际需要什么依赖这里加
 
-      - name: Build Packages.gz
-        run: bash scripts/build_packages.sh
+    - name: Build plugins for x86_64
+      run: |
+        echo "这里写你的 x86_64 编译和打包脚本"
+        # 例如：./scripts/build_x86_64.sh
 
-      - name: Upload to Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: latest
-          files: |
-            ipk/**/Packages.gz
-            ipk/**/*.ipk
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Build plugins for aarch64_cortex-a53
+      run: |
+        echo "这里写你的 aarch64_cortex-a53 编译和打包脚本"
+        # 例如：./scripts/build_aarch64.sh
+
+    - name: Upload .ipk files to GitHub Releases or GitHub Pages
+      run: |
+        echo "这里写你的上传脚本，比如使用 gh release 或上传到 pages"
+        # 例如：./scripts/upload.sh
+
+    - name: Run clean_old.sh to remove old versions
+      run: |
+        chmod +x ./scripts/clean_old.sh
+        ./scripts/clean_old.sh
+
 
