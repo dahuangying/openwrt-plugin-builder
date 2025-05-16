@@ -17,7 +17,7 @@ cd "$SDK_DIR"
 
 cat > feeds.conf.default << EOF
 src-git packages https://git.openwrt.org/feed/packages.git
-src-git luci https://git.openwrt.org/feed/luci.git
+src-git luci https://github.com/openwrt/luci.git
 src-git routing https://git.openwrt.org/feed/routing.git
 src-git telephony https://git.openwrt.org/feed/telephony.git
 
