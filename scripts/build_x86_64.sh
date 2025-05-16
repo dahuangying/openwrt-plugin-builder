@@ -14,9 +14,12 @@ SDK_DIR=$(find . -maxdepth 1 -type d -name "openwrt-sdk-22.03.6-x86-64*" | head 
 cd "$SDK_DIR"
 
 # ✅ 使用官方源 + 你自己的 feeds
-cat > feeds.conf.default <<EOF
-src-git packages https://github.com/openwrt/packages.git
-src-git luci https://github.com/openwrt/luci.git
+cat > feeds.conf.default << EOF
+src-git packages https://git.openwrt.org/feed/packages.git
+src-git luci https://git.openwrt.org/feed/luci.git
+src-git routing https://git.openwrt.org/feed/routing.git
+src-git telephony https://git.openwrt.org/feed/telephony.git
+
 src-git passwall https://github.com/xiaorouji/openwrt-passwall
 src-git passwall2 https://github.com/xiaorouji/openwrt-passwall2
 src-git helloworld https://github.com/fw876/helloworld
