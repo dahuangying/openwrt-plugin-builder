@@ -28,8 +28,3 @@
 # x86_64 设备使用：
 echo "src/gz custom_plugins https://dahuangying.github.io/openwrt-plugin-builder/packages/x86_64/" >> /etc/opkg/customfeeds.conf
 opkg update
-
-
-
-
-
