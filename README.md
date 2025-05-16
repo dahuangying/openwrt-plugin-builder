@@ -28,6 +28,10 @@
 
 ```bash
 echo "src/gz custom_plugins https://dahuangying.github.io/openwrt-plugin-builder/packages/x86_64/" >> /etc/opkg/customfeeds.conf
+
+### 如果你是 `aarch64_cortex-a53` 设备：
+
+```bash
 echo "src/gz custom_plugins https://dahuangying.github.io/openwrt-plugin-builder/packages/aarch64_cortex-a53/" >> /etc/opkg/customfeeds.conf
 
 
