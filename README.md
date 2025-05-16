@@ -28,4 +28,6 @@
 
 ```bash
 echo "src/gz custom_plugins https://dahuangying.github.io/openwrt-plugin-builder/packages/x86_64/" >> /etc/opkg/customfeeds.conf
+echo "src/gz custom_plugins https://dahuangying.github.io/openwrt-plugin-builder/packages/aarch64_cortex-a53/" >> /etc/opkg/customfeeds.conf
+
 
