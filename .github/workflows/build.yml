@@ -2,7 +2,7 @@ name: Build and Clean Plugins
 
 on:
   schedule:
-    - cron: '0 3 */7 * *'   # 每7天凌晨3点构建一次
+    - cron: '0 3 */7 * *'   # 每7天自动构建
   workflow_dispatch:        # 支持手动触发
 
 jobs:
@@ -20,24 +20,25 @@ jobs:
 
     - name: Build plugins for x86_64
       run: |
-        chmod +x ./scripts/build_x86_64.sh
+        chmod +x scripts/build_x86_64.sh
         ./scripts/build_x86_64.sh
 
     - name: Build plugins for aarch64_cortex-a53
       run: |
-        chmod +x ./scripts/build_aarch64.sh
+        chmod +x scripts/build_aarch64.sh
         ./scripts/build_aarch64.sh
 
-    - name: Clean old ipk files
+    - name: Clean old .ipk files
       run: |
-        chmod +x ./scripts/clean_old.sh
+        chmod +x scripts/clean_old.sh
         ./scripts/clean_old.sh
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./packages
+        publish_dir: ./ipk
+
 
 
 
