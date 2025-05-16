@@ -2,8 +2,11 @@ name: Build and Clean Plugins
 
 on:
   schedule:
-    - cron: '0 3 */7 * *'   # 每7天自动构建
-  workflow_dispatch:        # 支持手动触发
+    - cron: '0 3 */7 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write  # 必须添加这行，否则 gh-pages 推送会失败
 
 jobs:
   build:
@@ -33,11 +36,15 @@ jobs:
         chmod +x scripts/clean_old.sh
         ./scripts/clean_old.sh
 
+    - name: Debug: list files to be deployed
+      run: ls -R ./ipk
+
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./ipk
+
 
 
 
