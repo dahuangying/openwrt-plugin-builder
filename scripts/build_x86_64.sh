@@ -13,53 +13,47 @@ tar -xf openwrt-sdk-22.03.6-x86-64_*.tar.xz
 SDK_DIR=$(find . -maxdepth 1 -type d -name "openwrt-sdk-22.03.6-x86-64*" | head -n 1)
 cd "$SDK_DIR"
 
-# 添加插件源
-cp "$GITHUB_WORKSPACE/feeds.conf.default" feeds.conf.default
+# ✅ 使用官方源 + 你自己的 feeds
+cat > feeds.conf.default <<EOF
+src-git packages https://github.com/openwrt/packages.git
+src-git luci https://github.com/openwrt/luci.git
+src-git passwall https://github.com/xiaorouji/openwrt-passwall
+src-git passwall2 https://github.com/xiaorouji/openwrt-passwall2
+src-git helloworld https://github.com/fw876/helloworld
+src-git openclash https://github.com/vernesong/OpenClash
+EOF
 
-# 更新 feeds
+# 更新 & 安装所有 feeds
 ./scripts/feeds update -a
 ./scripts/feeds install -a
 
-# ✅ 自动修复 Config.in 中缺失的类型（例如 bool）
-echo "🔧 正在修复插件 Config.in 中缺失的 config 类型..."
-for config_file in feeds/*/luci-app-*/Config.in; do
+# ✅ 修复 Config.in 中缺失类型问题
+echo "🔧 修复 Config.in 缺失类型..."
+for config_file in feeds/*/*/Config.in; do
     [ -f "$config_file" ] || continue
-    echo "修复: $config_file"
-
     awk '
     BEGIN { skip = 0 }
-    /^config / {
-        print $0
-        skip = 1
-        next
-    }
-    /^[ \t]*prompt / && skip == 1 {
-        print "    bool \"\""
-        print $0
-        skip = 0
-        next
-    }
+    /^config / { print $0; skip = 1; next }
+    /^[ \t]*prompt / && skip == 1 { print "    bool \"\""; print $0; skip = 0; next }
     { print $0 }
     ' "$config_file" > "$config_file.fixed" && mv "$config_file.fixed" "$config_file"
 done
-echo "✅ 修复完成"
 
-# 复制 config 配置文件（你已有的 x86_64.config）
+# ✅ 拷贝你自己的 config 文件（确保包含 luci base 等依赖）
 cp "$GITHUB_WORKSPACE/config/x86_64.config" .config
-
-# 设置默认配置
 make defconfig
 
-# ❌ 修改这里，正确调用 feeds 下的插件路径
-make package/feeds/passwall/luci-app-passwall/compile -j$(nproc) || make package/feeds/passwall/luci-app-passwall/compile -j1 V=s
-make package/feeds/passwall2/luci-app-passwall2/compile -j$(nproc) || make package/feeds/passwall2/luci-app-passwall2/compile -j1 V=s
-make package/feeds/helloworld/shadowsocksr-libev/compile -j$(nproc) || make package/feeds/helloworld/shadowsocksr-libev/compile -j1 V=s
-make package/feeds/helloworld/luci-app-ssr-plus/compile -j$(nproc) || make package/feeds/helloworld/luci-app-ssr-plus/compile -j1 V=s
-make package/feeds/openclash/luci-app-openclash/compile -j$(nproc) || make package/feeds/openclash/luci-app-openclash/compile -j1 V=s
+# ✅ 编译插件，失败时回退单线程输出详细日志
+make package/passwall/compile -j$(nproc) || make package/passwall/compile -j1 V=s
+make package/passwall2/compile -j$(nproc) || make package/passwall2/compile -j1 V=s
+make package/shadowsocksr-libev/compile -j$(nproc) || make package/shadowsocksr-libev/compile -j1 V=s
+make package/luci-app-ssr-plus/compile -j$(nproc) || make package/luci-app-ssr-plus/compile -j1 V=s
+make package/luci-app-openclash/compile -j$(nproc) || make package/luci-app-openclash/compile -j1 V=s
 
-# 拷贝 .ipk 到项目目录
+# ✅ 拷贝 .ipk 到构建目录
 mkdir -p "$GITHUB_WORKSPACE/ipk/x86_64/"
 find bin/packages/ -name '*.ipk' -exec cp {} "$GITHUB_WORKSPACE/ipk/x86_64/" \;
+
 
 
 
