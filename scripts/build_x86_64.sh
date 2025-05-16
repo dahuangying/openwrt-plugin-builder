@@ -22,6 +22,7 @@ cp "$GITHUB_WORKSPACE/feeds.conf.default" feeds.conf.default
 
 # 复制 config 配置文件（你已有的 x86_64.config）
 cp "$GITHUB_WORKSPACE/config/x86_64.config" .config
+make defconfig
 
 # 设置默认配置
 make defconfig
