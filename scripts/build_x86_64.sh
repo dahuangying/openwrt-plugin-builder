@@ -11,7 +11,9 @@ if [ ! -d openwrt-sdk-22.03.6-x86-64* ]; then
   tar -xf openwrt-sdk-22.03.6-x86-64_gcc-11.2.0_musl.Linux-x86_64.tar.xz
 fi
 
-cd openwrt-sdk-22.03.6-x86-64*
+# 获取正确的 SDK 目录名
+SDK_DIR=$(find . -maxdepth 1 -type d -name "openwrt-sdk-22.03.6-x86-64*")
+cd "$SDK_DIR"
 
 cat > feeds.conf.default << EOF
 src-git packages https://git.openwrt.org/feed/packages.git
@@ -28,6 +30,13 @@ EOF
 ./scripts/feeds update -a
 ./scripts/feeds install -a
 
+# 修复 luci-app-ssr-plus 的 Makefile 防止类型错误
+SSR_PLUS_MK="feeds/helloworld/luci-app-ssr-plus/Makefile"
+if [ -f "$SSR_PLUS_MK" ]; then
+  sed -i '/^LUCI_DEPENDS/s/{/{\"+iptables-mod-tproxy\"}/' "$SSR_PLUS_MK"
+fi
+
+# 修复 Config.in 缺失类型
 echo "🔧 修复 Config.in 缺失类型..."
 find feeds -type f -name Config.in | while read -r config_file; do
   awk '
