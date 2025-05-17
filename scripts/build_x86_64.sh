@@ -9,7 +9,8 @@ SDK_URL="https://downloads.openwrt.org/releases/22.03.6/targets/x86/64/openwrt-s
 mkdir -p "$WORKDIR" && cd "$WORKDIR"
 [ ! -d openwrt-sdk-* ] && wget -c "$SDK_URL" && tar -xf *.tar.xz
 
-cd openwrt-sdk-*
+SDK_DIR=$(ls -d openwrt-sdk-22.03.6-x86-64* | head -n 1)
+cd "$SDK_DIR"
 
 # 设置 feeds（Lienol 优先）
 cat > feeds.conf.default <<EOF
